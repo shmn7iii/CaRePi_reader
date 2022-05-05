@@ -8,7 +8,7 @@ WORKDIR /carepi
 
 COPY . /carepi
 
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
