@@ -22,8 +22,3 @@ $ sudo modprobe -r port100
 ```
 
 ### 3. setup [config.ini](/config.ini)
-
-```
-# usb_bus_device
-$ lsusb
-```
