@@ -1,7 +1,8 @@
 #!/bin/bash
 
-pip3 install -r requirements.txt
-modprobe -r port100
+sudo apt-get install -y python3-pip
+sudo pip3 install -r requirements.txt
+sudo modprobe -r port100
 
 vendor=054c:06c3
 devices=$(lsusb -d $vendor | sed -e 's|Bus \(...\) Device \(...\).*|usb:\1:\2|')

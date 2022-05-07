@@ -6,19 +6,10 @@ Reader of CaRePi.
 
 ## setup
 
-### 1. install requirements
+### 1. configure [config.ini](/config.ini)
+
+### 2. Run script
 
 ```bash
-$ pip3 install -r requirements.txt
+./setup.sh
 ```
-
-### 2. setup nfc
-
-```
-$ sudo python3 -m nfc
-
-# if error
-$ sudo modprobe -r port100
-```
-
-### 3. setup [config.ini](/config.ini)
