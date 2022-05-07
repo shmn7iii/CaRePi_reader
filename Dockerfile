@@ -1,14 +1,14 @@
-FROM python:3.10.4
+FROM python:3
+USER root
 
 RUN apt-get update \
-  && apt-get upgrade -y \
-  && pip install --upgrade pip
+  && pip install --upgrade pip \
+  && pip install --upgrade setuptools
 
-WORKDIR /carepi
+WORKDIR /app
+COPY . /app
 
-COPY . /carepi
-
-RUN pip install -r requirements.txt
+RUN python -m pip install -r requirements.txt
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
