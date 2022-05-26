@@ -33,11 +33,6 @@ def alarm(sound):
     pygame.mixer.music.stop()
 
 
-def send_http_request(_data):
-    response = requests.post(api_url, data={'student_number': _data})
-    return response
-
-
 def on_connect(tag):
     print('==================================')
 
@@ -51,21 +46,8 @@ def on_connect(tag):
 
             print('Pi: ' + student_number)
             alarm('bell')
-
-            api_response = send_http_request(student_number)
-            api_json = json.loads(api_response.text)
-            if api_response.status_code == 200:
-                slack_response = requests.post('https://slack.com/api/chat.postMessage',
-                                               data={'token': slack_bot_token,
-                                                     'channel': slack_channel,
-                                                     'text': api_json['data'],
-                                                     'as_user': True})
-                print('API: 200, ' + api_json['data'])
-                print('Slack: ' + str(slack_response.status_code))
-                alarm('complete')
-            else:
-                print("[Error] %s" % api_response.text)
-                alarm('dialog-error')
+            time.sleep(6)
+            alarm('complete')
         except Exception as e:
             print("[Error] %s" % e)
             alarm('dialog-error')
