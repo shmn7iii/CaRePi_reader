@@ -3,6 +3,7 @@ import time
 import requests
 import configparser
 import json
+import pygame
 
 
 def config():
@@ -23,6 +24,15 @@ def config():
     slack_channel = config.get('CaRePi', 'slack_channel')
 
 
+def alarm(sound):
+    sound_file_path = f'/usr/share/sounds/Yaru/stereo/{sound}.oga'
+
+    pygame.mixer.init(frequency=44100)
+    pygame.mixer.music.load(sound_file_path)
+    pygame.mixer.music.play(1)
+    pygame.mixer.music.stop()
+
+
 def send_http_request(_data):
     response = requests.post(api_url, data={'student_number': _data})
     return response
@@ -30,6 +40,7 @@ def send_http_request(_data):
 
 def on_connect(tag):
     print('==================================')
+
     if isinstance(tag, nfc.tag.tt3.Type3Tag):
         try:
             sc = nfc.tag.tt3.ServiceCode(
@@ -39,6 +50,7 @@ def on_connect(tag):
                 [sc], [bc]).decode()[4:-2]
 
             print('Pi: ' + student_number)
+            alarm('bell')
 
             api_response = send_http_request(student_number)
             api_json = json.loads(api_response.text)
@@ -50,12 +62,18 @@ def on_connect(tag):
                                                      'as_user': True})
                 print('API: 200, ' + api_json['data'])
                 print('Slack: ' + str(slack_response.status_code))
+                alarm('complete')
             else:
                 print("[Error] %s" % api_response.text)
+                alarm('dialog-error')
         except Exception as e:
             print("[Error] %s" % e)
+            alarm('dialog-error')
     else:
         print("[Error] Invalied tag type.")
+        alarm('dialog-error')
+
+    print('==================================')
 
 
 def main():
