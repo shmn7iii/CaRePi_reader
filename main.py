@@ -3,6 +3,7 @@ import time
 import requests
 import configparser
 import json
+import pygame
 
 
 def config():
@@ -21,6 +22,16 @@ def config():
     usb_bus_device = config.get('CaRePi', 'usb_bus_device')
     slack_bot_token = config.get('CaRePi', 'slack_bot_token')
     slack_channel = config.get('CaRePi', 'slack_channel')
+    sound_file_root = config.get('CaRePi', 'sound_file_root')
+
+
+def alarm(sound):
+    sound_file = f'{sound_file_root}/{sound}.wav'
+
+    pygame.mixer.init(frequency=44100)
+    pygame.mixer.music.load(sound_file)
+    pygame.mixer.music.play(1)
+    pygame.mixer.music.stop()
 
 
 def send_http_request(_data):
@@ -50,12 +61,16 @@ def on_connect(tag):
                                                      'as_user': True})
                 print('API: 200, ' + api_json['data'])
                 print('Slack: ' + str(slack_response.status_code))
+                alarm('pi')
             else:
                 print("[Error] %s" % api_response.text)
+                alarm('bu')
         except Exception as e:
             print("[Error] %s" % e)
+            alarm('bu')
     else:
         print("[Error] Invalied tag type.")
+        alarm('bu')
 
 
 def main():
