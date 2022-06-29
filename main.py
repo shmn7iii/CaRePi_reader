@@ -22,20 +22,25 @@ def config():
     usb_bus_device = config.get('CaRePi', 'usb_bus_device')
     slack_bot_token = config.get('CaRePi', 'slack_bot_token')
     slack_channel = config.get('CaRePi', 'slack_channel')
+    sound_file_root = config.get('CaRePi', 'sound_file_root')
 
 
 def alarm(sound):
-    sound_file_path = f'/usr/share/sounds/Yaru/stereo/{sound}.oga'
+    sound_file = f'{sound_file_root}/{sound}.oga'
 
     pygame.mixer.init(frequency=44100)
-    pygame.mixer.music.load(sound_file_path)
+    pygame.mixer.music.load(sound_file)
     pygame.mixer.music.play(1)
     pygame.mixer.music.stop()
 
 
+def send_http_request(_data):
+    response = requests.post(api_url, data={'student_number': _data})
+    return response
+
+
 def on_connect(tag):
     print('==================================')
-
     if isinstance(tag, nfc.tag.tt3.Type3Tag):
         try:
             sc = nfc.tag.tt3.ServiceCode(
@@ -45,17 +50,27 @@ def on_connect(tag):
                 [sc], [bc]).decode()[4:-2]
 
             print('Pi: ' + student_number)
-            alarm('bell')
-            time.sleep(6)
-            alarm('complete')
+
+            api_response = send_http_request(student_number)
+            api_json = json.loads(api_response.text)
+            if api_response.status_code == 200:
+                slack_response = requests.post('https://slack.com/api/chat.postMessage',
+                                               data={'token': slack_bot_token,
+                                                     'channel': slack_channel,
+                                                     'text': api_json['data'],
+                                                     'as_user': True})
+                print('API: 200, ' + api_json['data'])
+                print('Slack: ' + str(slack_response.status_code))
+                alarm('pi')
+            else:
+                print("[Error] %s" % api_response.text)
+                alarm('bu')
         except Exception as e:
             print("[Error] %s" % e)
-            alarm('dialog-error')
+            alarm('bu')
     else:
         print("[Error] Invalied tag type.")
-        alarm('dialog-error')
-
-    print('==================================')
+        alarm('bu')
 
 
 def main():
