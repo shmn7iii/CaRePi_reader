@@ -32,6 +32,8 @@ def alarm(sound):
     pygame.mixer.init(frequency=44100)
     pygame.mixer.music.load(sound_file)
     pygame.mixer.music.play(1)
+    time.sleep(0.5)
+    pygame.mixer.music.stop
 
 
 def send_http_request(_data):
