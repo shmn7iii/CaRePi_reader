@@ -61,16 +61,19 @@ def on_connect(tag):
                                                      'as_user': True})
                 print('API: 200, ' + api_json['data'])
                 print('Slack: ' + str(slack_response.status_code))
-                alarm('pi')
+                if '入室' in api_json['data']:
+                    alarm('enter')
+                else:
+                    alarm('leave')
             else:
                 print("[Error] %s" % api_response.text)
-                alarm('bu')
+                alarm('error')
         except Exception as e:
             print("[Error] %s" % e)
-            alarm('bu')
+            alarm('error')
     else:
         print("[Error] Invalied tag type.")
-        alarm('bu')
+        alarm('error')
 
 
 def main():
